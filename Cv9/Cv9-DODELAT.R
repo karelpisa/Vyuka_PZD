@@ -1,1 +1,0 @@
-# Cviceni 9 dodelat!

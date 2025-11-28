@@ -1,10 +1,11 @@
+setwd("../Vyuka_PZD/Cv8/")
 #nacteni souboru
-soubory <- list.files("DataCv3/")
+soubory <- list.files("DataCv8/")
 # soubor <- soubory[1]
 nactiData <- function(soubory) {
   povodi <- list()
   for (soubor in soubory) {
-    povodi[[soubor]] <- read.table(paste0("DataCv3/", soubor), header = T)
+    povodi[[soubor]] <- read.table(paste0("DataCv8/", soubor), header = T)
     povodi[[soubor]][povodi[[soubor]]== (-99)] <- NA 
     povodi[[soubor]]$Date <- as.Date(povodi[[soubor]]$Date)
   }
@@ -119,7 +120,7 @@ RiverBoxplot <- function(data){
 }
 RiverBoxplot(data)
 
-saveRDS
+saveRDS(data, "data_povodi.rds")
 
 
 mean(c(0.001, 4.5))
