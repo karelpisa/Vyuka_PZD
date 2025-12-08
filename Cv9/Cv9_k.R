@@ -1,5 +1,6 @@
 # 1
-povodi <- readRDS("../Cv8/data_povodi.rds") #načtení dat z minulého cvičení
+
+povodi <- readRDS("~/OneDrive - CZU v Praze/github_projects/Vyuka_PZD/Cv8/data_povodi.rds") #načtení dat z minulého cvičení
 
 # vytvoření průměrných hodnot z jednotlivých dataframů
 P   <- c(mean(povodi[[1]]$P, na.rm = TRUE),
@@ -49,8 +50,38 @@ plotMeanBar <- function(povodi){
 
 plotMeanBar(povodi)
 
+#2
+plotVarTime <- function(data, name, var, dtmRange){
+  df <- data[[name]]
+  
+  df <- df[df$Date >= dtmRange[1] &
+        df$Date <= dtmRange[2], ]
+  if(var == "Q"){
+    namevar <- "Průtok"
+  }else if(var == "P"){
+    namevar <- "Srážka"
+  }else{
+    namevar <- "PET"
+  }
+  
+  plot(x = df$Date,
+       y = df[, var],
+       xlab = "Čas",
+       ylab = paste (var),
+       main = paste(name, ", ", namevar, ", ", dtmRange[1], "až", dtmRange[2]), 
+       type = "l")
+  
+}
 
-# 2
+plotVarTime(data = povodi, name = "SlateRiver", var = "Q", dtmRange = c("1989-01-01", "1991-01-01"))
+
+
+
+
+
+
+
+# 3
 df <- povodi[[1]]
 
 df$month_day <- format(df$Date, format = "%m-%d")
@@ -59,6 +90,7 @@ df_noleap <- df[df$month_day != "02-29", ]
 df_noleap$year <- format(df_noleap$Date, format = "%Y")
 
 df_split <- split(df_noleap, df_noleap$year)
+
 dates <- seq(as.Date("2019-01-01"), as.Date("2019-12-31"), by = "day")
 
 
@@ -68,14 +100,40 @@ i = "1950"
 
 for (i in seq_along(names(df_split))) {
   if (i == 1) {
-    plot(x = dates, y = df_split[[1]]$P, type = "l")
+    plot(x = dates, y = df_split[[1]]$P, type = "l", alpha = 0.5)
   }else{
     lines(x = dates, y = df_split[[i]]$P, ylim = max(df_split$P))
   }
 }
 
+plotYear <- function(data, name = "NULL", var = "NULL"){
+  df <- data[[name]]
+  
+  df$month_day <- format(df$Date, format = "%m-%d")
+  df_noleap <- df[df$month_day != "02-29", ]
+  df_noleap$year <- format(df_noleap$Date, format = "%Y")
+  df_split <- split(df_noleap, df_noleap$year)
+  
+  dates <- seq(as.Date("2019-01-01"), as.Date("2019-12-31"), by = "day")
+  plot(x = dates, y = df_split[[1]]$P, type = "l")
+  
+  for (i in seq_along(names(df_split))) {
+    if (i == 1) {
+      plot(x = dates, y = df_split[[1]][, var], type = "l",
+           xlab = "Den",
+           ylab = paste(var),
+           main = paste(name),
+           ylim = range(df[, var], na.rm = TRUE),
+           col = "grey")
+    }else{
+      lines(x = dates, y = df_split[[i]][, var], col = "grey")
+    }
+  }
+  
+  
+}
 
+plotYear(data = povodi, name = "MattaponiRiver", var = "Q")
 
-
-
+range(df[, "Q"], na.rm = TRUE)
 
