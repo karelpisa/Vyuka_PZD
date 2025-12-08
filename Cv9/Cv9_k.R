@@ -51,89 +51,90 @@ plotMeanBar <- function(povodi){
 plotMeanBar(povodi)
 
 #2
-plotVarTime <- function(data, name, var, dtmRange){
-  df <- data[[name]]
+plotVarTime <- function(data, name, var, dtmRange){ # Definuje funkci plotVarTime s parametry: data (list datových rámců), name (název řeky), var (proměnná Q, P, nebo PET), dtmRange (rozsah dat)
+  
+  df <- data[[name]] # Vybere datový rámec podle jména řeky z listu data
   
   df <- df[df$Date >= dtmRange[1] &
-        df$Date <= dtmRange[2], ]
-  if(var == "Q"){
+             df$Date <= dtmRange[2], ] # Filtruje data, aby obsahovala jen záznamy mezi začátkem a koncem dtmRange
+  
+  if(var == "Q"){         # Určí popisek proměnné podle toho, zda se jedná o Q, P nebo PET
     namevar <- "Průtok"
   }else if(var == "P"){
     namevar <- "Srážka"
   }else{
     namevar <- "PET"
   }
+
   
-  plot(x = df$Date,
+  plot(x = df$Date,     # Vytvoří čárový graf s daty: osa x = datum, osa y = vybraná proměnná, hlavní titulek obsahuje jméno řeky a proměnnou
        y = df[, var],
        xlab = "Čas",
        ylab = paste (var),
-       main = paste(name, ", ", namevar, ", ", dtmRange[1], "až", dtmRange[2]), 
+       main = paste(name, ",", namevar, ",", dtmRange[1], "až", dtmRange[2]), 
        type = "l")
+
   
 }
 
-plotVarTime(data = povodi, name = "SlateRiver", var = "Q", dtmRange = c("1989-01-01", "1991-01-01"))
-
-
-
+plotVarTime(data = povodi, name = "SlateRiver", var = "Q", dtmRange = c("1989-01-01", "1991-01-01"))        # Volá funkci plotVarTime pro řeku SlateRiver a proměnnou Q, s vybraným datovým rozsahem
 
 
 
 
 # 3
-df <- povodi[[1]]
+df <- povodi[[1]] # Vybere první datový rámec z listu povodi
 
-df$month_day <- format(df$Date, format = "%m-%d")
-df_noleap <- df[df$month_day != "02-29", ]
+df$month_day <- format(df$Date, format = "%m-%d") # Vytvoří novou proměnnou month_day obsahující měsíc a den z data (bez roku)
 
-df_noleap$year <- format(df_noleap$Date, format = "%Y")
+df_noleap <- df[df$month_day != "02-29", ] # Odstraní přestupné dny (29. února) pro jednotnou délku roku
 
-df_split <- split(df_noleap, df_noleap$year)
+df_noleap$year <- format(df_noleap$Date, format = "%Y") # Vytvoří sloupec s rokem z datového sloupce Date
 
-dates <- seq(as.Date("2019-01-01"), as.Date("2019-12-31"), by = "day")
+df_split <- split(df_noleap, df_noleap$year) # Rozdělí data podle roků do seznamu (každý rok zvlášť)
 
-
-
-i = "1950"
+dates <- seq(as.Date("2019-01-01"), as.Date("2019-12-31"), by = "day") # Vytvoří sekvenci dat pro jeden rok (2019) pro jednotnou osu x
 
 
 for (i in seq_along(names(df_split))) {
   if (i == 1) {
-    plot(x = dates, y = df_split[[1]]$P, type = "l", alpha = 0.5)
+    plot(x = dates, y = df_split[[1]]$P, type = "l", alpha = 0.5) # Pro první rok vykreslí graf s čárou (s částečnou průhledností)
   }else{
-    lines(x = dates, y = df_split[[i]]$P, ylim = max(df_split$P))
+    lines(x = dates, y = df_split[[i]]$P, ylim = max(df_split$P)) # Pro další roky přidá čáru do stávajícího grafu
   }
 }
 
-plotYear <- function(data, name = "NULL", var = "NULL"){
-  df <- data[[name]]
+
+
+plotYear <- function(data, name = "NULL", var = "NULL"){ # Definuje funkci plotYear, která vykreslí časové řady pro zadanou proměnnou a řeku
   
-  df$month_day <- format(df$Date, format = "%m-%d")
-  df_noleap <- df[df$month_day != "02-29", ]
-  df_noleap$year <- format(df_noleap$Date, format = "%Y")
-  df_split <- split(df_noleap, df_noleap$year)
+  df <- data[[name]] # Vybere datový rámec podle jména řeky
   
-  dates <- seq(as.Date("2019-01-01"), as.Date("2019-12-31"), by = "day")
-  plot(x = dates, y = df_split[[1]]$P, type = "l")
+  df$month_day <- format(df$Date, format = "%m-%d") #vytvářím sloupec ve formátu "mesic-den"
+  df_noleap <- df[df$month_day != "02-29", ] # Odstraní přestupné dny
+  df_noleap$year <- format(df_noleap$Date, format = "%Y") # Přidá sloupec s rokem
+  df_split <- split(df_noleap, df_noleap$year) # Rozdělí data podle roků
+  
+  dates <- seq(as.Date("2019-01-01"), as.Date("2019-12-31"), by = "day") #vytvoření sekvence datumu roku 2019 podle zadani
+  plot(x = dates, y = df_split[[1]]$P, type = "l") # Vykreslí první rok (slouží jen jako základní graf)
   
   for (i in seq_along(names(df_split))) {
-    if (i == 1) {
+    if (i == 1) { # Pro první rok vykreslí graf s osami, titulem a vhodným rozsahem y
       plot(x = dates, y = df_split[[1]][, var], type = "l",
            xlab = "Den",
            ylab = paste(var),
            main = paste(name),
            ylim = range(df[, var], na.rm = TRUE),
-           col = "grey")
+           col = "grey") 
     }else{
-      lines(x = dates, y = df_split[[i]][, var], col = "grey")
+      lines(x = dates, y = df_split[[i]][, var], col = "grey")      # Pro další roky přidá čáry do grafu ve šedé barvě   
+      
     }
   }
-  
-  
 }
 
-plotYear(data = povodi, name = "MattaponiRiver", var = "Q")
+plotYear(data = povodi, name = "MattaponiRiver", var = "Q")   # Volá funkci plotYear pro řeku MattaponiRiver a proměnnou Q
 
-range(df[, "Q"], na.rm = TRUE)
+
+
 
