@@ -77,10 +77,7 @@ plotVarTime <- function(data, name, var, dtmRange){ # Definuje funkci plotVarTim
   
 }
 
-plotVarTime(data = povodi, name = "SlateRiver", var = "Q", dtmRange = c("1989-01-01", "1991-01-01"))        # Volá funkci plotVarTime pro řeku SlateRiver a proměnnou Q, s vybraným datovým rozsahem
-
-
-
+plotVarTime(data = povodi, name = "MattaponiRiver", var = "Q", dtmRange = c("1990-01-01", "1995-01-01"))        # Volá funkci plotVarTime pro řeku SlateRiver a proměnnou Q, s vybraným datovým rozsahem
 
 # 3
 df <- povodi[[1]] # Vybere první datový rámec z listu povodi
